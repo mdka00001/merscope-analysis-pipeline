@@ -1,0 +1,7 @@
+# Ignore folders named 'plots'
+plots/
+
+# Ignore files with specific extensions
+*.png
+*.pdf
+*.h5ad
