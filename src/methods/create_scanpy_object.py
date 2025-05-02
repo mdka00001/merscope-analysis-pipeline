@@ -9,8 +9,9 @@ class CreateScanpyObject(BaseMethod):
         """
 
         # Load the input data
-        cell_by_gene = self.input_cell_by_gene
-        meta_cell = self.input_cell_metadata
+        print(f"Loading data from {self.input_cell_by_gene} and {self.input_cell_metadata}")
+        cell_by_gene = pd.read_csv(self.input_cell_by_gene, index_col=0)
+        meta_cell = pd.read_csv(self.input_cell_metadata, index_col=0)
 
         # Create a Scanpy object
         meta_cell['barcodeCount'] = cell_by_gene.sum(axis=1)
@@ -35,6 +36,7 @@ class CreateScanpyObject(BaseMethod):
         adata.var_names_make_unique()
 
         ##mitochondrial genes
+        print(f"mitochondrial genes")
         adata.var["mt"] = adata.var_names.str.startswith("mt-")
 
 
@@ -43,15 +45,18 @@ class CreateScanpyObject(BaseMethod):
         )
 
 
-        plot = sc.pl.violin(
+        sc.pl.violin(
             adata,
             ["n_genes_by_counts", "total_counts", "pct_counts_mt"],
             jitter=0.4,
             multi_panel=True,
+            show=False
         )
 
+        fig = plt.gcf()
+
         output = OutputDTO()
-        output.add_plot("qc_metrics", plot)
-        output.add_data("adata", adata)
+        output.add_plot(fig)
+        output.add_data(adata)
 
         return output

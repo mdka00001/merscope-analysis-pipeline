@@ -1,3 +1,5 @@
+print("Loading dependencies...")
+
 from copy import deepcopy
 
 import numpy as np

@@ -9,11 +9,11 @@ class OutputDTO:
         self.data = data if data is not None else {}
         self.plots = plots if plots is not None else {}
 
-    def add_data(self, key, value):
-        self.data[key] = value
+    def add_data(self, data):
+        self.data = data
 
-    def add_plot(self, key, figure):
-        self.plots[key] = figure
+    def add_plot(self, value):
+        self.plots = value
 
     def get_data(self):
         return self.data
@@ -36,9 +36,9 @@ class OutputDTO:
             os.makedirs(directory)
 
         path = os.path.join(directory, f"{filename}.{file_format}")
-        self.get_plots().savefig(path, format=file_format, dpi=dpi, bbox_inches='tight')
+        self.plots.savefig(fr"{path}")
         print(f"Plot saved to: {path}")
 
     def save_data(self, filename: str = "adata", directory: str = "data"):
-        self.get_data().write(fr"{filename}.h5ad", compression="gzip")
+        self.get_data().write(fr"{filename}.h5ad")
         print(f"Data saved to: {filename}.h5ad")
