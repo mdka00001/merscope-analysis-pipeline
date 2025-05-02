@@ -15,14 +15,14 @@ def parse_args():
     #filter cells
     parser_b = subparsers.add_parser('filter_cells', help='Filter cells based on metadata.')
     parser_b.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
-    parser_b.add_argument('--min_counts', type=str, required=True, help='Minimum counts for filtering counts.', default=50)
-    parser_b.add_argument('--min_cells', type=str, required=True, help='Minimum genes for filtering cells.', default=10)
-    parser_b.add_argument('--n_genes_by_counts', type=str, required=True, help='Maximum n_genes_by_counts threshold.')
-    parser_b.add_argument('--total_counts', type=str, required=True, help='Maximum total_counts threshold.')
+    parser_b.add_argument('--min_counts', type=int, required=True, help='Minimum counts for filtering counts.', default=50)
+    parser_b.add_argument('--min_cells', type=int, required=True, help='Minimum genes for filtering cells.', default=10)
+    parser_b.add_argument('--n_genes_by_counts', type=int, required=True, help='Maximum n_genes_by_counts threshold.')
+    parser_b.add_argument('--total_counts', type=int, required=True, help='Maximum total_counts threshold.')
 
     #dimensionality reduction
     parser_c = subparsers.add_parser('dimensionality_reduction', help='Perform dimensionality reduction.')
-    parser_c.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
+    parser_c.add_argument("--adata", type=str, required=True, help="Path to .h5ad file")
     parser_c.add_argument('--n_pcs', type=int, required=True, help='Number of principal components to compute.')
     parser_c.add_argument('--n_neighbors', type=int, required=True, help='Number of neighbors for UMAP.')
 
