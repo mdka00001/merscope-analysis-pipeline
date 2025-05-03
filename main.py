@@ -5,6 +5,7 @@ from src.methods.create_scanpy_object import *
 from src.output.outputDTO import *
 from src.methods.filter_cells import *
 from src.methods.dimensionality_reduction import *
+from src.methods.clustering import *
 
 
 def main():
@@ -56,6 +57,20 @@ def main():
         print("Dimensionality reduction completed successfully.")
 
         output.save_data(filename="dimensional_adata", directory="data")
+    elif args.command == "clustering":
+        print("Performing clustering...")
+        clustering = Clustering(
+            adata=args.adata,
+            resolution=args.resolution
+        )
+
+        output = clustering.run()
+        output.save_plot(directory="plots", file_format="png", dpi=300)
+        print("Clustering completed successfully.")
+
+        output.save_data(filename="clustered_adata", directory="data")
+
+    
     else:
         print("Invalid command. Please use 'create_scanpy_object'.")
 if __name__ == "__main__":
