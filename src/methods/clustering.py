@@ -12,6 +12,16 @@ class Clustering(BaseMethod):
         print(f"Loading data from {self.adata}")
         adata = sc.read_h5ad(self.adata)
 
+        print("neighbors")
+        sc.pp.neighbors(adata, 
+                        n_neighbors=self.n_neighbors, 
+                        n_pcs=self.n_pcs)
+        print("UMAP")
+        sc.tl.umap(adata)
+
+        print("tSNE")
+        sc.tl.tsne(adata, n_pcs=self.n_pcs)
+
         print("Leiden")
         sc.tl.leiden(adata, resolution=self.resolution)
 
@@ -19,13 +29,13 @@ class Clustering(BaseMethod):
         output.add_data(adata)
 
         # Plotting
-        plots = ["umap_leiden"]
+        plots = ["umap_leiden", "tSNE_leiden"]
 
         for plot in plots:
-            if plot == "umap_louvain":
-                sc.pl.umap(adata, color=["louvain"], show=False)
+            if plot == "tSNE_leiden":
+                sc.pl.tsne(adata, color=["leiden"], show=False)
                 fig = plt.gcf()
-                output.add_plot("umap_louvain", fig)
+                output.add_plot("tSNE_leiden", fig)
             elif plot == "umap_leiden":
                 sc.pl.umap(adata, color=["leiden"], show=False)
                 fig = plt.gcf()

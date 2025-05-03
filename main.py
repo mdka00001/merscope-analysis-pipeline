@@ -4,7 +4,6 @@ from src.methods.base import *
 from src.methods.create_scanpy_object import *
 from src.output.outputDTO import *
 from src.methods.filter_cells import *
-from src.methods.dimensionality_reduction import *
 from src.methods.clustering import *
 
 
@@ -41,27 +40,18 @@ def main():
         )
 
         output = filter_cells.run()
+
+        output.save_plot(directory="plots", file_format="png", dpi=300)
         output.save_data(filename="filtered_adata", directory="data")
         print("Cells filtered successfully.")
 
-    elif args.command == "dimensionality_reduction":
-        print("Performing dimensionality reduction...")
-        dimensional = Dimensional(
-            adata=args.adata,
-            n_pcs=args.n_pcs,
-            n_neighbors=args.n_neighbors
-        )
-
-        output = dimensional.run()
-        output.save_plot(directory="plots", file_format="png", dpi=300)
-        print("Dimensionality reduction completed successfully.")
-
-        output.save_data(filename="dimensional_adata", directory="data")
     elif args.command == "clustering":
         print("Performing clustering...")
         clustering = Clustering(
             adata=args.adata,
-            resolution=args.resolution
+            resolution=args.resolution,
+            n_pcs=args.n_pcs,
+            n_neighbors=args.n_neighbors
         )
 
         output = clustering.run()
