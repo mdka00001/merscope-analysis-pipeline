@@ -5,7 +5,8 @@ from src.methods.create_scanpy_object import *
 from src.output.outputDTO import *
 from src.methods.filter_cells import *
 from src.methods.clustering import *
-
+from src.methods.cluster_annotation import *
+from src.methods.visualizer import *
 
 def main():
     # Parse input arguments
@@ -51,7 +52,8 @@ def main():
             adata=args.adata,
             resolution=args.resolution,
             n_pcs=args.n_pcs,
-            n_neighbors=args.n_neighbors
+            n_neighbors=args.n_neighbors,
+            tsne=args.tsne
         )
 
         output = clustering.run()
@@ -59,6 +61,30 @@ def main():
         print("Clustering completed successfully.")
 
         output.save_data(filename="clustered_adata", directory="data")
+
+    elif args.command == "cluster_annotation":
+        print("Annotating clusters...")
+        cluster_annotation = ClusterAnnotation(
+            adata=args.adata,
+            ref_marker_panel=args.ref_marker_panel,
+            input_cell_by_gene=args.input_cell_by_gene
+        )
+
+        output = cluster_annotation.run()
+        output.save_plot(directory="plots", file_format="png", dpi=300)
+        print("Cluster annotation completed successfully.")
+
+        output.save_data(filename="annotated_adata", directory="data")
+    elif args.command == "visualize_spatial_map":
+        print("Visualizing spatial map...")
+        visualize_spatial_map = Visualizer(
+            adata=args.adata,
+            ref_marker_panel=args.ref_marker_panel,
+            input_cell_by_gene=args.input_cell_by_gene
+        )
+
+        visualize_spatial_map.run()
+
 
     
     else:
