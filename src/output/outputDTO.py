@@ -1,44 +1,45 @@
 from src.methods.dependencies import *
 import hdf5plugin
+
 class OutputDTO:
     def __init__(self, data=None, plots=None):
         """
-        data: dict of key results (e.g., filtered counts, clusters, annotations)
-        plots: dict of plot objects (e.g., matplotlib figures)
+        data: AnnData or similar primary output
+        plots: dict of named matplotlib figures (e.g., {'qc': fig1, 'umap': fig2})
         """
-        self.data = data if data is not None else {}
+        self.data = data
         self.plots = plots if plots is not None else {}
 
     def add_data(self, data):
         self.data = data
 
-    def add_plot(self, value):
-        self.plots = value
+    def add_plot(self, name: str, figure):
+        """Add a named plot to the collection."""
+        self.plots[name] = figure
 
     def get_data(self):
         return self.data
 
     def get_plots(self):
         return self.plots
-    
-    def save_plot(self, filename: str = "plot", directory: str = "plots", file_format: str = "png", dpi: int = 300):
-        """
-        Saves a matplotlib figure to a specified directory with the given filename.
 
-        Parameters:
-            figure (matplotlib.figure.Figure): The plot object to save.
-            filename (str): Desired filename without extension.
-            directory (str): Directory to save the plot (default is 'plots').
-            file_format (str): Image format (e.g., 'png', 'jpg', 'pdf').
-            dpi (int): Resolution of the saved image.
+    def save_plot(self, directory: str = "plots", file_format: str = "png", dpi: int = 300):
+        """
+        Saves all plots in the `plots` dictionary to the specified directory.
         """
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        path = os.path.join(directory, f"{filename}.{file_format}")
-        self.plots.savefig(fr"{path}")
-        print(f"Plot saved to: {path}")
+        for name, fig in self.plots.items():
+            path = os.path.join(directory, f"{name}.{file_format}")
+            fig.savefig(path, dpi=dpi)
+            print(f"Plot saved to: {path}")
 
     def save_data(self, filename: str = "adata", directory: str = "data"):
-        self.get_data().write(fr"{filename}.h5ad")
-        print(f"Data saved to: {filename}.h5ad")
+        """Saves the AnnData object to an h5ad file."""
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        full_path = os.path.join(directory, f"{filename}.h5ad")
+        self.data.write(full_path, compression="gzip")
+        print(f"Data saved to: {full_path}")
