@@ -20,27 +20,27 @@ def parse_args():
     parser_b.add_argument('--n_genes_by_counts', type=int, required=True, help='Maximum n_genes_by_counts threshold.')
     parser_b.add_argument('--total_counts', type=int, required=True, help='Maximum total_counts threshold.')
 
-    #dimensionality reduction
-    parser_c = subparsers.add_parser('dimensionality_reduction', help='Perform dimensionality reduction.')
-    parser_c.add_argument("--adata", type=str, required=True, help="Path to .h5ad file")
-    parser_c.add_argument('--n_pcs', type=int, required=True, help='Number of principal components to compute.')
-    parser_c.add_argument('--n_neighbors', type=int, required=True, help='Number of neighbors for UMAP.')
-
 
 
     #clustering
     parser_d = subparsers.add_parser('clustering', help='Perform clustering on the data.')
     parser_d.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
     parser_d.add_argument('--resolution', type=float, required=True, help='Resolution parameter for clustering.')
+    parser_d.add_argument('--n_pcs', type=int, required=True, help='Number of principal components to compute.')
+    parser_d.add_argument('--n_neighbors', type=int, required=True, help='Number of neighbors for UMAP.')
+    parser_d.add_argument('--tsne', type=bool, required=False, help='Run tSNE.', default=False)
 
     #cluster annotation
     parser_e = subparsers.add_parser('cluster_annotation', help='Annotate clusters.')
     parser_e.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
     parser_e.add_argument('--ref_marker_panel', type=str, required=True, help='Reference marker genes dataset for cluster annotation.')
+    parser_e.add_argument('--input_cell_by_gene', type=str, required=True, help='csv file of cell by genes.')
 
     #visualize spatial map
     parser_f = subparsers.add_parser('visualize_spatial_map', help='Visualize spatial map of the data.')
     parser_f.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
+    parser_f.add_argument('--ref_marker_panel', type=str, required=True, help='Reference marker genes dataset for cluster annotation.')
+    parser_f.add_argument('--input_cell_by_gene', type=str, required=True, help='csv file of cell by genes.')
     #
     
     # Parse arguments

@@ -5,7 +5,7 @@ class BaseMethod:
                  adata = None, min_counts=50, min_cells=10,
                  n_genes_by_counts=None, total_counts=None,
                  n_pcs=None, n_neighbors=None,
-                 resolution=None, ref_marker_panel=None):
+                 resolution=None, ref_marker_panel=None, tsne=None):
         
         self.input_cell_by_gene = input_cell_by_gene if input_cell_by_gene is not None else {}
         self.input_cell_metadata = input_cell_metadata if input_cell_metadata is not None else {}
@@ -18,6 +18,7 @@ class BaseMethod:
         self.n_neighbors = n_neighbors if n_neighbors is not None else {}
         self.resolution = resolution if resolution is not None else {}
         self.ref_marker_panel = ref_marker_panel if ref_marker_panel is not None else {}
+        self.tsne = tsne if tsne is not None else {}
 
 
         
