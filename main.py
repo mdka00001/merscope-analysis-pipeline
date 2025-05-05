@@ -4,8 +4,9 @@ from src.methods.base import *
 from src.methods.create_scanpy_object import *
 from src.output.outputDTO import *
 from src.methods.filter_cells import *
-from src.methods.dimensionality_reduction import *
-
+from src.methods.clustering import *
+from src.methods.cluster_annotation import *
+from src.methods.visualizer import *
 
 def main():
     # Parse input arguments
@@ -19,7 +20,8 @@ def main():
         # Create a Scanpy object
         create_scanpy_object = CreateScanpyObject(
             input_cell_by_gene=args.input_cell_by_gene, 
-            input_cell_metadata=args.input_cell_metadata)
+            input_cell_metadata=args.input_cell_metadata,
+            ref_marker_panel=args.ref_marker_panel)
         
         
         output = create_scanpy_object.run()
@@ -40,22 +42,52 @@ def main():
         )
 
         output = filter_cells.run()
+
+        output.save_plot(directory="plots", file_format="png", dpi=300)
         output.save_data(filename="filtered_adata", directory="data")
         print("Cells filtered successfully.")
 
-    elif args.command == "dimensionality_reduction":
-        print("Performing dimensionality reduction...")
-        dimensional = Dimensional(
+    elif args.command == "clustering":
+        print("Performing clustering...")
+        clustering = Clustering(
             adata=args.adata,
+            resolution=args.resolution,
             n_pcs=args.n_pcs,
-            n_neighbors=args.n_neighbors
+            n_neighbors=args.n_neighbors,
+            tsne=args.tsne
         )
 
-        output = dimensional.run()
+        output = clustering.run()
         output.save_plot(directory="plots", file_format="png", dpi=300)
-        print("Dimensionality reduction completed successfully.")
+        print("Clustering completed successfully.")
 
-        output.save_data(filename="dimensional_adata", directory="data")
+        output.save_data(filename="clustered_adata", directory="data")
+
+    elif args.command == "cluster_annotation":
+        print("Annotating clusters...")
+        cluster_annotation = ClusterAnnotation(
+            adata=args.adata,
+            input_cell_by_gene=args.input_cell_by_gene
+        )
+
+        output = cluster_annotation.run()
+        output.save_plot(directory="plots", file_format="png", dpi=300)
+        print("Cluster annotation completed successfully.")
+
+        output.save_data(filename="annotated_adata", directory="data")
+    elif args.command == "visualize_spatial_map":
+        print("Visualizing spatial map...")
+        visualize_spatial_map = Visualizer(
+            adata=args.adata,
+            ref_marker_panel=args.ref_marker_panel,
+            input_cell_by_gene=args.input_cell_by_gene,
+            input_cell_metadata=args.input_cell_metadata
+        )
+
+        visualize_spatial_map.run()
+
+
+    
     else:
         print("Invalid command. Please use 'create_scanpy_object'.")
 if __name__ == "__main__":

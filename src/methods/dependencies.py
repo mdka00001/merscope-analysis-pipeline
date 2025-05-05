@@ -32,3 +32,4 @@ def json_zip(j):
     return zip_json_string
 
 import os
+import anndata as ad

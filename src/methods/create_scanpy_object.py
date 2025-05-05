@@ -21,7 +21,36 @@ class CreateScanpyObject(BaseMethod):
         meta_gene = meta_gene.loc[keep_genes]
         meta_gene['expression'] = cell_by_gene.sum(axis=0)
 
-        adata = sc.AnnData(X=cell_by_gene.values, obs=meta_cell, var=meta_gene)
+        vizgen_genes = meta_gene.index.tolist()
+
+        #load metagene
+        
+        df_ref_panel_ini = pd.read_excel(self.ref_marker_panel, index_col=0)
+        df_ref_panel = df_ref_panel_ini.iloc[1:,:1]
+        df_ref_panel.index.name = None
+        df_ref_panel.columns = ['Function']
+
+        
+        marker_genes = df_ref_panel[df_ref_panel['Function'].str.contains('marker')].index.tolist()
+        common_marker_genes = list(set(meta_gene.index.tolist()).intersection(marker_genes))
+        meta_gene.loc[common_marker_genes, 'Markers'] = df_ref_panel.loc[common_marker_genes, 'Function']
+        meta_gene['Markers'] = meta_gene['Markers'].apply(lambda x: 'N.A.' if 'marker' not in str(x) else x)
+        meta_gene['Markers'].value_counts()
+
+
+        min_count = 50
+        keep_cells = meta_cell[meta_cell['barcodeCount'] >= min_count].index.tolist()
+        meta_cell = meta_cell.loc[keep_cells]
+        cell_by_gene = cell_by_gene.loc[keep_cells]
+
+        # reset index of cell_by_gene and meta_cell
+        new_index = range(len(meta_cell.index.tolist()))
+        meta_cell.index = new_index
+        cell_by_gene.index = new_index
+        cell_by_gene.shape
+
+        adata = ad.AnnData(X=cell_by_gene.values, obs=meta_cell, var=meta_gene)
+        adata.obsm["spatial"] = meta_cell[["center_x", "center_y"]].values
         adata.var_names_make_unique()
 
         # Annotate mitochondrial genes
@@ -35,6 +64,8 @@ class CreateScanpyObject(BaseMethod):
 
         output = OutputDTO()
         output.add_data(adata)
+
+        print(adata)
 
         # Generate and store QC plots
         qc_metrics = ["n_genes_by_counts", "total_counts", "pct_counts_mt"]
