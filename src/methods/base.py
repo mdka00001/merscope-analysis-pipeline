@@ -12,8 +12,8 @@ class BaseMethod:
         self.adata = adata if adata is not None else {}
         self.min_counts = min_counts
         self.min_cells = min_cells
-        self.n_genes_by_counts = n_genes_by_counts if n_genes_by_counts is not None else {}
-        self.total_counts = total_counts if total_counts is not None else {}
+        self.n_genes_by_counts = n_genes_by_counts if n_genes_by_counts is not None else None
+        self.total_counts = total_counts if total_counts is not None else None
         self.n_pcs = n_pcs if n_pcs is not None else {}
         self.n_neighbors = n_neighbors if n_neighbors is not None else {}
         self.resolution = resolution if resolution is not None else {}

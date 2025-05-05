@@ -20,7 +20,8 @@ def main():
         # Create a Scanpy object
         create_scanpy_object = CreateScanpyObject(
             input_cell_by_gene=args.input_cell_by_gene, 
-            input_cell_metadata=args.input_cell_metadata)
+            input_cell_metadata=args.input_cell_metadata,
+            ref_marker_panel=args.ref_marker_panel)
         
         
         output = create_scanpy_object.run()
@@ -66,7 +67,6 @@ def main():
         print("Annotating clusters...")
         cluster_annotation = ClusterAnnotation(
             adata=args.adata,
-            ref_marker_panel=args.ref_marker_panel,
             input_cell_by_gene=args.input_cell_by_gene
         )
 
@@ -80,7 +80,8 @@ def main():
         visualize_spatial_map = Visualizer(
             adata=args.adata,
             ref_marker_panel=args.ref_marker_panel,
-            input_cell_by_gene=args.input_cell_by_gene
+            input_cell_by_gene=args.input_cell_by_gene,
+            input_cell_metadata=args.input_cell_metadata
         )
 
         visualize_spatial_map.run()

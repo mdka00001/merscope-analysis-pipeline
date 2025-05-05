@@ -25,8 +25,6 @@ class Clustering(BaseMethod):
         else:
             print("tSNE not performed")
 
-        print("tSNE")
-        sc.tl.tsne(adata, n_pcs=self.n_pcs)
 
         print("Leiden")
         sc.tl.leiden(adata, resolution=self.resolution)
@@ -35,13 +33,18 @@ class Clustering(BaseMethod):
         output.add_data(adata)
 
         # Plotting
-        plots = ["umap_leiden", "tSNE_leiden", "spatial_leiden"]
+        plots = ["umap_leiden", "tSNE_leiden", "umap_spatial"]
 
         for plot in plots:
             if plot == "tSNE_leiden":
-                sc.pl.tsne(adata, color=["leiden"], show=False)
-                fig = plt.gcf()
-                output.add_plot("tSNE_leiden", fig)
+                if self.tsne == False:
+                    print("tSNE not performed")
+                    continue
+                else:
+                    print("tSNE performed")
+                    sc.pl.tsne(adata, color=["leiden"], show=False)
+                    fig = plt.gcf()
+                    output.add_plot("tSNE_leiden", fig)
 
 
             elif plot == "umap_leiden":
@@ -49,9 +52,11 @@ class Clustering(BaseMethod):
                 fig = plt.gcf()
                 output.add_plot("umap_leiden", fig)
 
-            elif plot == "spatial_leiden":
-                sc.pl.spatial(adata, color=["leiden"], show=False)
+            elif plot == "umap_spatial":
+                sq.pl.spatial_scatter(
+                    adata, shape=None, color="leiden", size=0.5, library_id="spatial", figsize=(10, 10), show=False
+                )
                 fig = plt.gcf()
-                output.add_plot("spatial_leiden", fig)
+                output.add_plot("umap_spatial", fig)
 
         return output

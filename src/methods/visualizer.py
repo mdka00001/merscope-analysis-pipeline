@@ -12,18 +12,9 @@ class Visualizer(BaseMethod):
         adata = sc.read_h5ad(self.adata)
 
         # initialize meta_gene
-        cell_by_gene = pd.read_csv(self.input_cell_by_gene, index_col=0)
-        meta_gene = pd.DataFrame(index=cell_by_gene.columns.tolist())
-
-        # drop blanks for single cell analysis
-        keep_genes = [x for x in cell_by_gene.columns.tolist() if 'Blank' not in x]
-
-        cell_by_gene = cell_by_gene[keep_genes]
-        meta_gene = meta_gene.loc[keep_genes]
-
-        meta_gene['expression'] = cell_by_gene.sum(axis=0)
-
-        vizgen_genes = meta_gene.index.tolist()
+        cell_by_gene = deepcopy(adata.to_df())
+        meta_gene = adata.var.copy()
+        meta_cell = adata.obs.copy()
 
         ser_counts = adata.obs['leiden'].value_counts()
         ser_counts.name = 'cell counts'
@@ -40,7 +31,7 @@ class Visualizer(BaseMethod):
         meta_leiden['leiden'] = pd.Series(meta_leiden.index.tolist(), index=meta_leiden.index.tolist())
 
         # generate colors for categories by plotting
-        sc.pl.umap(adata, color="leiden", legend_loc='on data')
+        #sc.pl.umap(adata, color="leiden", legend_loc='on data')
         cats = adata.obs['leiden'].cat.categories.tolist()
         colors = list(adata.uns['leiden_colors'])
         cat_colors = dict(zip(cats, colors))  
@@ -54,17 +45,7 @@ class Visualizer(BaseMethod):
         meta_gene['info'] = pd.Series('', index=meta_gene.index.tolist())
         df_colors.loc[''] = 'white'
 
-        df_ref_panel_ini = pd.read_excel(self.ref_marker_panel, index_col=0)
-        df_ref_panel = df_ref_panel_ini.iloc[1:,:1]
-        df_ref_panel.index.name = None
-        df_ref_panel.columns = ['Function']
-
-        marker_genes = df_ref_panel[df_ref_panel['Function'].str.contains('marker')].index.tolist()
-        common_marker_genes = list(set(meta_gene.index.tolist()).intersection(marker_genes))
-        meta_gene.loc[common_marker_genes, 'Markers'] = df_ref_panel.loc[common_marker_genes, 'Function']
-        meta_gene['Markers'] = meta_gene['Markers'].apply(lambda x: 'N.A.' if 'marker' not in str(x) else x)
-        meta_gene['Markers'].value_counts()
-
+        
         # Clip Z-score values for visual purposes
         sig_leiden_clip = deepcopy(sig_leiden)
         sig_leiden_clip[sig_leiden_clip < -5] = -5
@@ -74,9 +55,9 @@ class Visualizer(BaseMethod):
         sig_leiden_clip = sig_leiden_clip.loc[sorted(sig_leiden_clip.index.tolist())]
         sig_leiden_clip.head()
 
+
         meta_gene = pd.DataFrame(index=sig_leiden.index.tolist())
         meta_gene['Markers'] = pd.Series('N.A.', index=sig_leiden.index.tolist())
-        meta_gene.loc[common_marker_genes, 'Markers'] = df_ref_panel.loc[common_marker_genes, 'Function']
 
         df_colors.loc['N.A.', 'color'] = 'white'
 
@@ -94,10 +75,11 @@ class Visualizer(BaseMethod):
             max_cat = '_'.join(sorted(ser_counts[ser_counts == max_count].index.tolist()))
             max_cat = max_cat.replace(' marker', '').replace(' ', '-')
 
-            print(inst_cluster, max_cat)  
+            #print(inst_cluster, max_cat)  
             meta_leiden.loc[inst_cluster, 'Cell_Type'] = max_cat
 
         
+        # hierarchically cluster leiden signatures
         # hierarchically cluster leiden signatures
         net = Network(CGM2)
         net.load_df(sig_leiden_clip, meta_col=meta_leiden, col_cats=['leiden', 'Cell_Type', 'cell counts'], 
@@ -110,6 +92,7 @@ class Visualizer(BaseMethod):
         ################################################
         cell_by_gene.index = range(len(cell_by_gene.index.tolist()))
         gex_int = cell_by_gene.astype(int)
+        #print(gex_int)
 
         # new gex_dict
         ###################
@@ -134,7 +117,7 @@ class Visualizer(BaseMethod):
 
         zip_gex_dict = json_zip(gex_dict)
 
-        
+
         df_pos = adata.obs[['center_x', 'center_y', 'leiden']]
         df_pos[['center_x', 'center_y']] = df_pos[['center_x', 'center_y']].round(2)
         df_pos.columns = ['x', 'y', 'leiden']
@@ -160,7 +143,7 @@ class Visualizer(BaseMethod):
 
         inputs = {
             'zoom': -3.75, 
-            'ini_cat': 'leiden',
+            'ini_cat': 'Vwf',
             'ini_map_type': 'Spatial',
             'ini_min_radius': 1.0,
             'zip_obs_data': zip_obs_data,
@@ -173,8 +156,7 @@ class Visualizer(BaseMethod):
         # initialize df_points DataFrame for neighborhood calculations
         df_points = pd.concat([df_name, df_pos], axis=1)
 
-        embed('@vizgen/umap-spatial-heatmap-single-cell-0-3-1', cells=['viewof cgm', 'dashboard'], inputs=inputs, display_logo=False)
-
+        return inputs
 
 
         

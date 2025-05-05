@@ -53,16 +53,6 @@ class ClusterAnnotation(BaseMethod):
         meta_gene['info'] = pd.Series('', index=meta_gene.index.tolist())
         df_colors.loc[''] = 'white'
 
-        df_ref_panel_ini = pd.read_excel(self.ref_marker_panel, index_col=0)
-        df_ref_panel = df_ref_panel_ini.iloc[1:,:1]
-        df_ref_panel.index.name = None
-        df_ref_panel.columns = ['Function']
-
-        marker_genes = df_ref_panel[df_ref_panel['Function'].str.contains('marker')].index.tolist()
-        common_marker_genes = list(set(meta_gene.index.tolist()).intersection(marker_genes))
-        meta_gene.loc[common_marker_genes, 'Markers'] = df_ref_panel.loc[common_marker_genes, 'Function']
-        meta_gene['Markers'] = meta_gene['Markers'].apply(lambda x: 'N.A.' if 'marker' not in str(x) else x)
-        meta_gene['Markers'].value_counts()
 
         # Clip Z-score values for visual purposes
         sig_leiden_clip = deepcopy(sig_leiden)
@@ -73,13 +63,9 @@ class ClusterAnnotation(BaseMethod):
         sig_leiden_clip = sig_leiden_clip.loc[sorted(sig_leiden_clip.index.tolist())]
         sig_leiden_clip.head()
 
-        meta_gene = pd.DataFrame(index=sig_leiden.index.tolist())
-        meta_gene['Markers'] = pd.Series('N.A.', index=sig_leiden.index.tolist())
-        meta_gene.loc[common_marker_genes, 'Markers'] = df_ref_panel.loc[common_marker_genes, 'Function']
 
         df_colors.loc['N.A.', 'color'] = 'white'
 
-        meta_leiden['Cell_Type'] = pd.Series('N.A.', index=meta_leiden.index.tolist())
         num_top_genes = 30
         for inst_cluster in sig_leiden.columns.tolist():
             top_genes = sig_leiden[inst_cluster].sort_values(ascending=False).index.tolist()[:num_top_genes]

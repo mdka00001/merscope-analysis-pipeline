@@ -16,10 +16,17 @@ class FilterCells(BaseMethod):
         sc.pp.filter_genes(adata, min_cells=self.min_cells)
 
         # Filter cells based on n_genes_by_counts and total_counts
-        adata = adata[(adata.obs["n_genes_by_counts"] < self.n_genes_by_counts) ].copy()
-        # Filter cells based on n_genes_by_counts and total_counts
-        adata = adata[(adata.obs["total_counts"] < self.total_counts) ].copy()
-
+        print(self.n_genes_by_counts)
+        if self.n_genes_by_counts is not None:
+            print(f"Filtering cells with n_genes_by_counts > {self.n_genes_by_counts}")
+            adata = adata[(adata.obs["n_genes_by_counts"] < self.n_genes_by_counts) ].copy()
+        else:
+            print("No n_genes_by_counts filtering applied.")
+        if self.total_counts is not None:
+            print(f"Filtering cells with total_counts > {self.total_counts}")
+            adata = adata[(adata.obs["total_counts"] < self.total_counts) ].copy()
+        else:
+            print("No total_counts filtering applied.")
 
 
         # dividing by volume instead

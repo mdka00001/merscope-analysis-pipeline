@@ -10,15 +10,16 @@ def parse_args():
     parser_a = subparsers.add_parser('create_scanpy_object', help='Create a scanpy object from input files.')
     parser_a.add_argument('--input_cell_by_gene', type=str, required=True, help='csv file of cell by genes.')
     parser_a.add_argument('--input_cell_metadata', type=str, required=True, help='csv file of cell metadata.')
+    parser_a.add_argument('--ref_marker_panel', type=str, required=True, help='Reference marker genes dataset for cluster annotation.')
 
 
     #filter cells
     parser_b = subparsers.add_parser('filter_cells', help='Filter cells based on metadata.')
     parser_b.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
-    parser_b.add_argument('--min_counts', type=int, required=True, help='Minimum counts for filtering counts.', default=50)
-    parser_b.add_argument('--min_cells', type=int, required=True, help='Minimum genes for filtering cells.', default=10)
-    parser_b.add_argument('--n_genes_by_counts', type=int, required=True, help='Maximum n_genes_by_counts threshold.')
-    parser_b.add_argument('--total_counts', type=int, required=True, help='Maximum total_counts threshold.')
+    parser_b.add_argument('--min_counts', type=int, required=False, help='Minimum counts for filtering counts.', default=50)
+    parser_b.add_argument('--min_cells', type=int, required=False, help='Minimum genes for filtering cells.', default=10)
+    parser_b.add_argument('--n_genes_by_counts', type=int, required=False, help='Maximum n_genes_by_counts threshold.')
+    parser_b.add_argument('--total_counts', type=int, required=False, help='Maximum total_counts threshold.')
 
 
 
@@ -33,14 +34,13 @@ def parse_args():
     #cluster annotation
     parser_e = subparsers.add_parser('cluster_annotation', help='Annotate clusters.')
     parser_e.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
-    parser_e.add_argument('--ref_marker_panel', type=str, required=True, help='Reference marker genes dataset for cluster annotation.')
     parser_e.add_argument('--input_cell_by_gene', type=str, required=True, help='csv file of cell by genes.')
 
     #visualize spatial map
     parser_f = subparsers.add_parser('visualize_spatial_map', help='Visualize spatial map of the data.')
     parser_f.add_argument('--adata', type=str, required=True, help='annotation data (scanpy object).')
-    parser_f.add_argument('--ref_marker_panel', type=str, required=True, help='Reference marker genes dataset for cluster annotation.')
     parser_f.add_argument('--input_cell_by_gene', type=str, required=True, help='csv file of cell by genes.')
+    parser_f.add_argument('--input_cell_metadata', type=str, required=True, help='csv file of cell metadata.')
     #
     
     # Parse arguments
