@@ -30,6 +30,8 @@ The pipeline is executed via `main.py` and exposes several sub‑commands:
 python main.py create_scanpy_object \
   --input_cell_by_gene <cell_by_gene.csv> \
   --input_cell_metadata <cell_metadata.csv>
+  --path_to_data <PATH TO METADATA> \
+  --ref_marker_panel <REFERENCE CELL TYPE MARKER PANEL>
 ```
 
 This step reads the CSV files, drops blank genes, calculates QC metrics (including mitochondrial content) and produces violin plots for metrics such as `n_genes_by_counts` and `total_counts`. The result is stored as an AnnData object.
@@ -50,10 +52,12 @@ Filters cells and genes using Scanpy utility functions and simple thresholds. Th
 ### 3. Dimensionality reduction
 
 ```
-python main.py dimensionality_reduction \
+python main.py clustering \
   --adata <filtered_adata.h5ad> \
-  --n_pcs 50 \
-  --n_neighbors 15
+  --resolution <LEIDEN CLUSTERING RESOLUTION VALUE>
+  --n_pcs <INT>\
+  --n_neighbors <INT> \
+  --tsne <BOOL>
 ```
 
 Normalises the data, logs, scales and then computes PCA, UMAP and t‑SNE embeddings. Plots for each step are written to the `plots` directory.
